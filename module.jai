@@ -41,47 +41,37 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
 
         builder: String_Builder;
 
-        // append(*builder, "function_type :: #type ");
+        append(*builder, "(() -> (");
 
-        // {
-        //     append(*builder, "(");
+        {
+            append(*builder, "(");
 
-        //     for arg, arg_index: header.arguments {
-        //         print_expression(*builder, arg);
+            for arg, arg_index: header.arguments {
+                print_expression(*builder, arg);
 
-        //         if arg_index < header.arguments.count - 1 {
-        //             append(*builder, ", ");
-        //         }
-        //     }
+                if arg_index < header.arguments.count - 1 {
+                    append(*builder, ",");
+                }
+            }
 
-        //     append(*builder, ") ");
+            append(*builder, ") -> (");
 
-        //     if header.returns.count > 0 {
-        //         append(*builder, "-> ");
-        //     }
+            for ret, ret_index: header.returns {
+                print_expression(*builder, ret);
 
-        //     for ret, ret_index: header.returns {
-        //         print_expression(*builder, ret);
+                if ret_index < header.returns.count - 1 {
+                    append(*builder, ",");
+                }
+            }
 
-        //         if ret_index < header.returns.count - 1 {
-        //             append(*builder, ", ");
-        //         } else {
-        //             append(*builder, " ");
-        //         }
-        //     }
-
-        //     append(*builder, ";\n");
-        // }
+            append(*builder, ")");
+        }
         
-        append(*builder, "() -> type_of(function_call) #expand {\n");
+        append(*builder, ") #expand {\n");
 
-        // append(*builder, )
-
-        append(*builder, "print(\"got here1\\n\");\n");
         append(*builder, "if capture_entries.count < capture_entries_byte_count {\n");
         append(*builder, "    array_resize(*capture_entries, capture_entries_byte_count);\n");
         append(*builder, "}\n");
-        append(*builder, "print(\"got here2\\n\");\n");
 
         capture_byte_offset := capture_entries_byte_count;
 
@@ -100,7 +90,6 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
 
             capture_entries_byte_count += entry.size;
         }
-        append(*builder, "print(\"got here3\\n\");\n");
 
         append(*builder, "generated :: (");
 
@@ -129,7 +118,6 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
         }
 
         append(*builder, "{\n");
-        append(*builder, "print(\"got here4\\n\");\n");
 
         for statement: header.body_or_null.block.statements {
             capture_name: string;
@@ -165,11 +153,10 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
         }
 
         append(*builder, "}\n");
-        append(*builder, "print(\"got here5\\n\");\n");
 
         append(*builder, "return generated;\n");
 
-        append(*builder, "}();\n");
+        append(*builder, "}());\n");
 
         return builder_to_string(*builder);
     // }();
