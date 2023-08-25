@@ -4,6 +4,8 @@ capture :: ($function: $F) -> F #expand {
         function_capture_sizes: [..] struct {
             name: string;
             size: int;
+            type: Type;
+            type_inst: *Code_Type_Instantiation;
         };
 
         // get the function capture offsets
@@ -24,6 +26,8 @@ capture :: ($function: $F) -> F #expand {
                         entry := array_add(*function_capture_sizes);
                         entry.name = declaration.name;
                         entry.size = runtime_size;
+                        entry.type = (cast(*Type) *declaration.type_inst.result).*;
+                        entry.type_inst = declaration.type_inst;
                     }
                 }
             }
@@ -52,7 +56,16 @@ capture :: ($function: $F) -> F #expand {
 
         for entry: function_capture_sizes {
             append(*builder, tprint("%_pointer := *`%;\n", entry.name, entry.name));
-            append(*builder, tprint("memcpy(capture_entries.data + %, %_pointer, %);\n", capture_entries_byte_count, entry.name, entry.size));
+            append(*builder, tprint("%_type :: #type ", entry.name));
+            print_expression(*builder, entry.type_inst);
+            append(*builder, ";\n");
+            append(*builder, tprint("#if #run is_pointer_of(%_type, type_of(`%)) {\n", entry.name, entry.name));
+            append(*builder, tprint("    memcpy(capture_entries.data + %, *%_pointer, %);\n", capture_entries_byte_count, entry.name, entry.size));
+            append(*builder, tprint("} else #if #run %_type == type_of(`%) {\n", entry.name, entry.name));
+            append(*builder, tprint("    memcpy(capture_entries.data + %, %_pointer, %);\n", capture_entries_byte_count, entry.name, entry.size));
+            append(*builder, "} else {\n");
+            append(*builder, "    #run assert(false, \"Your captured values do not match by value, or by pointer.\");\n");
+            append(*builder, "}\n");
 
             capture_entries_byte_count += entry.size;
         }
@@ -101,6 +114,11 @@ capture :: ($function: $F) -> F #expand {
                 }
             }
 
+            single_line: String_Builder;
+            print_expression(*single_line, statement);
+            print("%\n", builder_to_string(*single_line));
+
+
             print_expression(*builder, statement);
             if capture_name {
                 offset := 0;
@@ -108,7 +126,7 @@ capture :: ($function: $F) -> F #expand {
                     if entry.name == capture_name {
                         // TODO if you're capturing something that's 1 more of a pointer than the original, we will actually point to it in memory instead of dereference
 
-                        // name = ---;
+                        // name: T = ---;
                         // memcpy(*name, current_capture_entry.data + offset, size);
 
                         append(*builder, " = ---;\n");
@@ -131,6 +149,18 @@ capture :: ($function: $F) -> F #expand {
 }
 
 #scope_file
+
+is_pointer_of :: (pointer: Type, normal: Type) -> bool {
+    info := cast(*Type_Info) pointer;
+    if info.type != .POINTER {
+        return false;
+    }
+
+    pointer_info := cast(*Type_Info_Pointer) pointer;
+    pointer_to_type := (cast(*Type) *pointer_info.pointer_to).*;
+
+    return pointer_to_type == normal;
+}
 
 capture_entries: [] u8;
 #no_reset capture_entries_byte_count: int;
