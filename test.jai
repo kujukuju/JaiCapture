@@ -20,7 +20,11 @@ main :: () {
     // after being captured by value, we don't care!
     out_of_scope = 6;
 
+    second_captured_function_call := capture(function_call);
+
     captured_function_call();
+
+    second_captured_function_call();
 }
 
 #scope_file
