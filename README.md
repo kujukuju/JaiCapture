@@ -28,6 +28,7 @@ main :: () {
     function_call :: () {
         out_of_scope: int; @capture
         print("captured out of scope is %\n", out_of_scope);
+        // captured out of scope is 4
     };
 
     captured_function_call := capture(function_call);
@@ -39,5 +40,6 @@ main :: () {
     })();
 
     print("updated out of scope is %\n", out_of_scope);
+    // updated out of scope is 2
 }
 ```

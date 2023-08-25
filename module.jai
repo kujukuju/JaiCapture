@@ -104,11 +104,6 @@ capture :: ($function: $F) -> F #expand {
                 }
             }
 
-            single_line: String_Builder;
-            print_expression(*single_line, statement);
-            print("%\n", builder_to_string(*single_line));
-
-
             print_expression(*builder, statement);
             if capture_name {
                 offset := 0;
