@@ -36,7 +36,7 @@ main :: () {
 
     capture(() {
         out_of_scope: *int; @capture
-        << out_of_scope = 2;
+        out_of_scope.* = 2;
     })();
 
     print("updated out of scope is %\n", out_of_scope);

@@ -1,6 +1,6 @@
 
-capture :: ($function: $F) -> F #expand {
-    #insert #run () -> string {
+capture :: ($function: $F, $caller := #caller_code) -> string #expand {
+    // #insert,scope(caller) #run () -> string {
         function_capture_sizes: [..] struct {
             name: string;
             size: int;
@@ -33,6 +33,7 @@ capture :: ($function: $F) -> F #expand {
             }
         }
 
+
         allocation_size := 0;
         for entry: function_capture_sizes {
             allocation_size += entry.size;
@@ -40,9 +41,47 @@ capture :: ($function: $F) -> F #expand {
 
         builder: String_Builder;
 
-        append(*builder, "if capture_entries.count < capture_entries_byte_count {");
-        append(*builder, "    array_resize(*capture_entries, capture_entries_byte_count);");
-        append(*builder, "}");
+        // append(*builder, "function_type :: #type ");
+
+        // {
+        //     append(*builder, "(");
+
+        //     for arg, arg_index: header.arguments {
+        //         print_expression(*builder, arg);
+
+        //         if arg_index < header.arguments.count - 1 {
+        //             append(*builder, ", ");
+        //         }
+        //     }
+
+        //     append(*builder, ") ");
+
+        //     if header.returns.count > 0 {
+        //         append(*builder, "-> ");
+        //     }
+
+        //     for ret, ret_index: header.returns {
+        //         print_expression(*builder, ret);
+
+        //         if ret_index < header.returns.count - 1 {
+        //             append(*builder, ", ");
+        //         } else {
+        //             append(*builder, " ");
+        //         }
+        //     }
+
+        //     append(*builder, ";\n");
+        // }
+        
+        append(*builder, "() -> type_of(function_call) #expand {\n");
+
+        // append(*builder, )
+
+        append(*builder, "print(\"got here1\\n\");\n");
+        append(*builder, "if capture_entries.count < capture_entries_byte_count {\n");
+        append(*builder, "    array_resize(*capture_entries, capture_entries_byte_count);\n");
+        append(*builder, "}\n");
+        append(*builder, "print(\"got here2\\n\");\n");
 
         capture_byte_offset := capture_entries_byte_count;
 
@@ -53,7 +92,7 @@ capture :: ($function: $F) -> F #expand {
             append(*builder, ";\n");
             append(*builder, tprint("#if #run is_pointer_of(%_type, type_of(`%)) {\n", entry.name, entry.name));
             append(*builder, tprint("    memcpy(capture_entries.data + %, *%_pointer, %);\n", capture_entries_byte_count, entry.name, entry.size));
-            append(*builder, tprint("} else #if #run %_type == type_of(`%) {\n", entry.name, entry.name));
+            append(*builder, tprint("} else #if #run %_type == type_of(%) {\n", entry.name, entry.name));
             append(*builder, tprint("    memcpy(capture_entries.data + %, %_pointer, %);\n", capture_entries_byte_count, entry.name, entry.size));
             append(*builder, "} else {\n");
             append(*builder, "    #run assert(false, \"Your captured values do not match by value, or by pointer.\");\n");
@@ -61,6 +100,7 @@ capture :: ($function: $F) -> F #expand {
 
             capture_entries_byte_count += entry.size;
         }
+        append(*builder, "print(\"got here3\\n\");\n");
 
         append(*builder, "generated :: (");
 
@@ -89,6 +129,7 @@ capture :: ($function: $F) -> F #expand {
         }
 
         append(*builder, "{\n");
+        append(*builder, "print(\"got here4\\n\");\n");
 
         for statement: header.body_or_null.block.statements {
             capture_name: string;
@@ -124,14 +165,18 @@ capture :: ($function: $F) -> F #expand {
         }
 
         append(*builder, "}\n");
+        append(*builder, "print(\"got here5\\n\");\n");
+
+        append(*builder, "return generated;\n");
+
+        append(*builder, "}();\n");
 
         return builder_to_string(*builder);
-    }();
-
-    return generated;
+    // }();
 }
 
-#scope_file
+capture_entries: [] u8;
+#no_reset capture_entries_byte_count: int;
 
 is_pointer_of :: (pointer: Type, normal: Type) -> bool {
     info := cast(*Type_Info) pointer;
@@ -145,8 +190,7 @@ is_pointer_of :: (pointer: Type, normal: Type) -> bool {
     return pointer_to_type == normal;
 }
 
-capture_entries: [] u8;
-#no_reset capture_entries_byte_count: int;
+#scope_file
 
 #import "Basic";
 #import "Compiler";
