@@ -1,6 +1,6 @@
 
-capture :: ($function: $F, $caller := #caller_code) -> string #expand {
-    // #insert,scope(caller) #run () -> string {
+capture :: ($function: $F, $caller := #caller_code) -> F #expand {
+    #insert,scope(caller) #run () -> string {
         function_capture_sizes: [..] struct {
             name: string;
             size: int;
@@ -41,7 +41,7 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
 
         builder: String_Builder;
 
-        append(*builder, "(() -> (");
+        append(*builder, "return (() -> (");
 
         {
             append(*builder, "(");
@@ -159,7 +159,7 @@ capture :: ($function: $F, $caller := #caller_code) -> string #expand {
         append(*builder, "}());\n");
 
         return builder_to_string(*builder);
-    // }();
+    }();
 }
 
 capture_entries: [] u8;

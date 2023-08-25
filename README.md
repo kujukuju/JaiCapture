@@ -16,12 +16,6 @@ Each uniquely polymorphically compiled `capture` call has it's own unique captur
 
 This is fine if you immediately call into the captured function from within the same scope of that loop, but if you're storing all these captured functions in an array or something to call later, they will all operate on the same underlying captured data. This also might not matter, for example if everything is captured by pointer, but it's a limitation to be aware of.
 
-### Future Improvements
-
-Right now, in order to get around scope issues, I'm forcing everything to be #insert #run. It seems reasonable that I should be able to solve this with #insert,scope() but there seem to be bugs here.
-
-I'm also going to add auto capture in the case where you don't specify anything.
-
 ### How To Use
 
 ```jai
@@ -37,13 +31,13 @@ main :: () {
         // captured out of scope is 4
     };
 
-    captured_function_call := #insert #run capture(function_call);
+    captured_function_call := capture(function_call);
     captured_function_call();
 
-    (#insert #run capture(() {
+    capture(() {
         out_of_scope: *int; @capture
         out_of_scope.* = 2;
-    }))();
+    })();
 
     print("updated out of scope is %\n", out_of_scope);
     // updated out of scope is 2
