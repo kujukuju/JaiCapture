@@ -32,8 +32,26 @@ main :: () {
 
     value_captured_function_call();
     print("third modified out of scope is %\n", out_of_scope);
-
 }
+
+// main :: () {
+//     out_of_scope: int = 4;
+
+//     function_call :: () {
+//         out_of_scope: int; @capture
+//         print("captured out of scope is %\n", out_of_scope);
+//     };
+
+//     captured_function_call := capture(function_call);
+//     captured_function_call();
+
+//     capture(() {
+//         out_of_scope: *int; @capture
+//         << out_of_scope = 2;
+//     })();
+
+//     print("updated out of scope is %\n", out_of_scope);
+// }
 
 #scope_file
 

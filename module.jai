@@ -40,19 +40,11 @@ capture :: ($function: $F) -> F #expand {
 
         builder: String_Builder;
 
-        // current_capture_index := capture_entries_count;
-        // capture_entries_count += 1;
-
         append(*builder, "if capture_entries.count < capture_entries_byte_count {");
         append(*builder, "    array_resize(*capture_entries, capture_entries_byte_count);");
         append(*builder, "}");
 
-        // append(*builder, tprint("if capture_entries[%].count != % {\n", current_capture_index, allocation_size));
-        // append(*builder, tprint("    capture_entries[%] = NewArray(%, u8);\n", current_capture_index, allocation_size));
-        // append(*builder, "}\n");
-
         capture_byte_offset := capture_entries_byte_count;
-        // append(*builder, tprint("current_capture_entry := capture_entries.data + %;\n", capture_byte_offset));
 
         for entry: function_capture_sizes {
             append(*builder, tprint("%_pointer := *`%;\n", entry.name, entry.name));
@@ -98,8 +90,6 @@ capture :: ($function: $F) -> F #expand {
 
         append(*builder, "{\n");
 
-        // append(*builder, tprint("current_capture_entry := capture_entries.data + %;\n", capture_byte_offset));
-
         for statement: header.body_or_null.block.statements {
             capture_name: string;
             type_inst: *Code_Type_Instantiation;
@@ -124,8 +114,6 @@ capture :: ($function: $F) -> F #expand {
                 offset := 0;
                 for entry: function_capture_sizes {
                     if entry.name == capture_name {
-                        // TODO if you're capturing something that's 1 more of a pointer than the original, we will actually point to it in memory instead of dereference
-
                         // name: T = ---;
                         // memcpy(*name, current_capture_entry.data + offset, size);
 
