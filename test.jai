@@ -1,27 +1,68 @@
 
-ComplexType :: struct (A: Type) {
-    thing: A;
-}
+// ComplexType :: struct (A: Type) {
+//     thing: A;
+// }
+
+// main :: () {
+//     out_of_scope: ComplexType(int);
+//     out_of_scope.thing = 1;
+
+//     generic_call(out_of_scope);
+
+//     print("generated complex type is %\n", out_of_scope);
+// }
+
+// generic_call :: (a: ComplexType($T)) {
+//     function_call :: () {
+//         a: ComplexType(T); @capture
+//         print("thing is %\n", a.thing);
+//     };
+
+//     array_resize(*capture_entries, 100);
+
+//     captured := capture(function_call);
+//     captured();
+// }
 
 main :: () {
-    out_of_scope: ComplexType(int);
-    out_of_scope.thing = 1;
+    function :: () -> bool {
+        StructType :: struct {
+            a: int;
+            b: *bool;
+        }
 
-    generic_call(out_of_scope);
+        value: bool;
 
-    print("generated complex type is %\n", out_of_scope);
-}
+        declared := StructType.{
+            1,
+            *value,
+        };
 
-generic_call :: (a: ComplexType($T)) {
-    function_call :: () {
-        a: ComplexType(T); @capture
-        print("thing is %\n", a.thing);
+        defined_function :: (a: int) -> int {
+            return a;
+        }
+
+        print("ran\n");
+        
+        return true;
     };
 
-    array_resize(*capture_entries, 100);
+    // capture(function)();
 
-    captured := capture(function_call);
-    captured();
+    #insert #run () -> Code {
+        function_code := code_of(function);
+        function_root := compiler_get_nodes(function_code);
+        return compiler_get_code(function_root);
+        // header := cast(*Code_Procedure_Header) function_root;
+        // builder: String_Builder;
+        // for statement: header.body_or_null.block.statements {
+        //     print_expression(*builder, statement);
+        //     append(*builder, ";");
+        //     append(*builder, "\n");
+        // }
+
+        // print("%\n", builder_to_string(*builder));
+    }();
 }
 
 // main :: () {

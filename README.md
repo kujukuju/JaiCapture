@@ -16,6 +16,8 @@ Each uniquely polymorphically compiled `capture` call has it's own unique captur
 
 This is fine if you immediately call into the captured function from within the same scope of that loop, but if you're storing all these captured functions in an array or something to call later, they will all operate on the same underlying captured data. This also might not matter, for example if everything is captured by pointer, but it's a limitation to be aware of.
 
+This library doesn't yet work with nested captures. This is fixable in the future but it's hard.
+
 ### How To Use
 
 ```jai

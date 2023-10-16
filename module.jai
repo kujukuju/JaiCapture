@@ -17,8 +17,9 @@ capture :: ($function: $F, $caller := #caller_code) -> F #expand {
             if statement.kind == .DECLARATION {
                 declaration := cast(*Code_Declaration) statement;
 
-                assert(!!declaration.type_inst);
-                assert(!!declaration.type_inst.result);
+                if !declaration.type_inst || !declaration.type_inst.result {
+                    continue;
+                }
 
                 for note: declaration.notes {
                     if note.text == "capture" {
