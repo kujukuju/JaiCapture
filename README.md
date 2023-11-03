@@ -1,3 +1,9 @@
+# Warning
+
+Probably don't use this library. I wanted to have anonymous captures in jai, but I had a parallel issue in my code that I _think_ I narrowed down to being caused by the JaiCapture library.
+
+I'm not sure how, and the repro case was extremely rare, so instead of fixing it, I'll just say if you're going to be working in a multithreaded environment, probably don't use this library.
+
 ## JaiCapture
 
 Closure captures in jai that kind of works at compile time.
