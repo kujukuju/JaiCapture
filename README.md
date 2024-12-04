@@ -12,6 +12,8 @@ Like the actual thing `capture` will return is a struct that contains the functi
 
 The actual function `capture` returns just reads this raw memory from the address, passes it into the inner function that it generates.
 
+I guess the actual size of the returned function would be pointer sized though so idk but I think this is close to a reasonable answer...
+
 ## JaiCapture
 
 Closure captures in jai that kind of works at compile time.
