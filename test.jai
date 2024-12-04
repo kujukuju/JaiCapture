@@ -24,81 +24,81 @@
 //     captured();
 // }
 
-main :: () {
-    function :: () -> bool {
-        StructType :: struct {
-            a: int;
-            b: *bool;
-        }
+// main :: () {
+//     function :: () -> bool {
+//         StructType :: struct {
+//             a: int;
+//             b: *bool;
+//         }
 
-        value: bool;
+//         value: bool;
 
-        declared := StructType.{
-            1,
-            *value,
-        };
+//         declared := StructType.{
+//             1,
+//             *value,
+//         };
 
-        defined_function :: (a: int) -> int {
-            return a;
-        }
+//         defined_function :: (a: int) -> int {
+//             return a;
+//         }
 
-        print("ran\n");
+//         print("ran\n");
         
-        return true;
+//         return true;
+//     };
+
+//     // capture(function)();
+
+//     #insert #run () -> Code {
+//         function_code := code_of(function);
+//         function_root := compiler_get_nodes(function_code);
+//         return compiler_get_code(function_root);
+//         // header := cast(*Code_Procedure_Header) function_root;
+//         // builder: String_Builder;
+//         // for statement: header.body_or_null.block.statements {
+//         //     print_expression(*builder, statement);
+//         //     append(*builder, ";");
+//         //     append(*builder, "\n");
+//         // }
+
+//         // print("%\n", builder_to_string(*builder));
+//     }();
+// }
+
+main :: () {
+    out_of_scope: int = 4;
+
+    value_function_call :: () {
+        out_of_scope: int; @capture
+
+        print("value first out of scope is %\n", out_of_scope);
+        out_of_scope = 3;    
+        print("value second out of scope is %\n", out_of_scope);
     };
 
-    // capture(function)();
+    pointer_function_call :: () {
+        out_of_scope: *int; @capture
 
-    #insert #run () -> Code {
-        function_code := code_of(function);
-        function_root := compiler_get_nodes(function_code);
-        return compiler_get_code(function_root);
-        // header := cast(*Code_Procedure_Header) function_root;
-        // builder: String_Builder;
-        // for statement: header.body_or_null.block.statements {
-        //     print_expression(*builder, statement);
-        //     append(*builder, ";");
-        //     append(*builder, "\n");
-        // }
+        print("first out of scope is %\n", << out_of_scope);
+        << out_of_scope = 2;
+        print("second out of scope is %\n", << out_of_scope);
+    };
 
-        // print("%\n", builder_to_string(*builder));
-    }();
+    first_captured_function_call := capture(pointer_function_call);
+    second_captured_function_call := capture(pointer_function_call);
+    value_captured_function_call := capture(value_function_call);
+
+    first_captured_function_call();
+    print("first modified out of scope is %\n", out_of_scope);
+
+    out_of_scope = 6;
+
+    second_captured_function_call();
+    print("second modified out of scope is %\n", out_of_scope);
+
+    value_captured_function_call();
+    print("third modified out of scope is %\n", out_of_scope);
 }
-
-// main :: () {
-//     out_of_scope: int = 4;
-
-//     value_function_call :: () {
-//         out_of_scope: int; @capture
-
-//         print("value first out of scope is %\n", out_of_scope);
-//         out_of_scope = 3;    
-//         print("value second out of scope is %\n", out_of_scope);
-//     };
-
-//     pointer_function_call :: () {
-//         out_of_scope: *int; @capture
-
-//         print("first out of scope is %\n", << out_of_scope);
-//         << out_of_scope = 2;
-//         print("second out of scope is %\n", << out_of_scope);
-//     };
-
-//     first_captured_function_call := capture(pointer_function_call);
-//     second_captured_function_call := capture(pointer_function_call);
-//     value_captured_function_call := capture(value_function_call);
-
-//     first_captured_function_call();
-//     print("first modified out of scope is %\n", out_of_scope);
-
-//     out_of_scope = 6;
-
-//     second_captured_function_call();
-//     print("second modified out of scope is %\n", out_of_scope);
-
-//     value_captured_function_call();
-//     print("third modified out of scope is %\n", out_of_scope);
-// }
 
 // main :: () {
 //     out_of_scope: int = 4;

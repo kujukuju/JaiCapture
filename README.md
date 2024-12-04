@@ -4,6 +4,14 @@ Probably don't use this library. I wanted to have anonymous captures in jai, but
 
 I'm not sure how, and the repro case was extremely rare, so instead of fixing it, I'll just say if you're going to be working in a multithreaded environment, probably don't use this library.
 
+## Future self note
+
+I think this might actually work if you capture the stuff, put it in a struct bundled with the function somewhere, and then when you call the function it puts the stuff into the scope memory, and calls into an inner function that reads it... I guess.
+
+Like the actual thing `capture` will return is a struct that contains the function pointer and directly after it the raw memory of the thing to be passed in.
+
+The actual function `capture` returns just reads this raw memory from the address, passes it into the inner function that it generates.
+
 ## JaiCapture
 
 Closure captures in jai that kind of works at compile time.
